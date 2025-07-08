@@ -27,10 +27,9 @@
       border-radius: 8px;
       font-weight: bold;
     }
-    .reiniciar {
+    .reiniciar, .toggle-contagem {
       position: absolute;
       top: 20px;
-      right: 20px;
       padding: 10px 15px;
       font-size: 12px;
       background-color: #444;
@@ -39,12 +38,15 @@
       border-radius: 5px;
       cursor: pointer;
     }
+    .reiniciar { right: 20px; }
+    .toggle-contagem { right: 160px; }
+
     .item-sorteado {
       font-size: 32px;
       font-weight: bold;
       margin-top: 20px;
       color: #b9cbb0;
-      transition: transform 0.30s ease, font-size 0.30s ease;
+      transition: transform 0.3s ease, font-size 0.3s ease;
     }
     .item-animado {
       position: fixed;
@@ -56,7 +58,7 @@
       padding: 20px;
       border-radius: 10px;
       z-index: 1000;
-      animation: destaque 0s ease-in-out;
+      animation: destaque 2.5s ease-in-out;
     }
     @keyframes destaque {
       0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
@@ -71,14 +73,28 @@
       margin-right: auto;
       color: #ccc;
     }
+    .contagem {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 100px;
+      color: #fff;
+      z-index: 2000;
+      background-color: rgba(0,0,0,0.8);
+      padding: 40px;
+      border-radius: 20px;
+    }
   </style>
 </head>
 <body>
   <button class="reiniciar" onclick="reiniciarSorteio()">Reiniciar Sorteio</button>
+  <button class="toggle-contagem" onclick="alternarContagem()" id="botaoContagem">Habilitar Contagem</button>
   <h1>✨ Bingo da Beleza ✨</h1>
-  <button onclick="sortearItem()">Sortear Item</button>
+  <button onclick="acionarSorteio()">Sortear Item</button>
   <div class="item-sorteado" id="itemSorteado">Clique no botão para começar!</div>
   <div class="sorteados" id="sorteados"></div>
+  <audio id="somSorteio" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
 
   <script>
     const itens = [
@@ -93,8 +109,39 @@
 
     let itensRestantes = JSON.parse(localStorage.getItem('itensRestantes')) || [...itens];
     let itensSorteados = JSON.parse(localStorage.getItem('itensSorteados')) || [];
+    let contagemAtiva = JSON.parse(localStorage.getItem('contagemAtiva')) || false;
 
+    document.getElementById("botaoContagem").textContent = contagemAtiva ? "Desabilitar Contagem" : "Habilitar Contagem";
     atualizarTela();
+
+    function acionarSorteio() {
+      if (contagemAtiva) {
+        iniciarContagem(3);
+      } else {
+        sortearItem();
+      }
+    }
+
+    function iniciarContagem(num) {
+      const contador = document.createElement('div');
+      contador.className = 'contagem';
+      contador.id = 'contador';
+      document.body.appendChild(contador);
+
+      let atual = num;
+      contador.textContent = atual;
+
+      const intervalo = setInterval(() => {
+        atual--;
+        if (atual > 0) {
+          contador.textContent = atual;
+        } else {
+          clearInterval(intervalo);
+          document.body.removeChild(contador);
+          sortearItem();
+        }
+      }, 1000);
+    }
 
     function sortearItem() {
       if (itensRestantes.length === 0) {
@@ -114,10 +161,12 @@
       animado.textContent = item;
       document.body.appendChild(animado);
 
+      document.getElementById('somSorteio').play();
+
       setTimeout(() => {
         document.body.removeChild(animado);
         atualizarTela();
-      }, 1000);
+      }, 2500);
     }
 
     function atualizarTela() {
@@ -127,9 +176,14 @@
     }
 
     function reiniciarSorteio() {
-      localStorage.removeItem('itensRestantes');
-      localStorage.removeItem('itensSorteados');
+      localStorage.clear();
       location.reload();
+    }
+
+    function alternarContagem() {
+      contagemAtiva = !contagemAtiva;
+      localStorage.setItem('contagemAtiva', JSON.stringify(contagemAtiva));
+      document.getElementById("botaoContagem").textContent = contagemAtiva ? "Desabilitar Contagem" : "Habilitar Contagem";
     }
   </script>
 </body>
