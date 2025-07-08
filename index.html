@@ -27,11 +27,41 @@
       border-radius: 8px;
       font-weight: bold;
     }
+    .reiniciar {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 10px 15px;
+      font-size: 12px;
+      background-color: #444;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
     .item-sorteado {
       font-size: 32px;
       font-weight: bold;
       margin-top: 20px;
       color: #b9cbb0;
+      transition: transform 0.3s ease, font-size 0.3s ease;
+    }
+    .item-animado {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(2);
+      font-size: 60px;
+      background-color: #031003;
+      padding: 20px;
+      border-radius: 10px;
+      z-index: 1000;
+      animation: destaque 1s ease-in-out;
+    }
+    @keyframes destaque {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+      50% { opacity: 1; transform: translate(-50%, -50%) scale(2); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
     }
     .sorteados {
       margin-top: 40px;
@@ -44,6 +74,7 @@
   </style>
 </head>
 <body>
+  <button class="reiniciar" onclick="reiniciarSorteio()">Reiniciar Sorteio</button>
   <h1>✨ Bingo da Beleza ✨</h1>
   <button onclick="sortearItem()">Sortear Item</button>
   <div class="item-sorteado" id="itemSorteado">Clique no botão para começar!</div>
@@ -60,8 +91,10 @@
       "Sérum facial", "Shampoo", "Sombra unitária", "Água micelar"
     ];
 
-    let itensRestantes = [...itens];
-    let itensSorteados = [];
+    let itensRestantes = JSON.parse(localStorage.getItem('itensRestantes')) || [...itens];
+    let itensSorteados = JSON.parse(localStorage.getItem('itensSorteados')) || [];
+
+    atualizarTela();
 
     function sortearItem() {
       if (itensRestantes.length === 0) {
@@ -73,8 +106,30 @@
       const item = itensRestantes.splice(index, 1)[0];
       itensSorteados.push(item);
 
-      document.getElementById('itemSorteado').textContent = item;
+      localStorage.setItem('itensRestantes', JSON.stringify(itensRestantes));
+      localStorage.setItem('itensSorteados', JSON.stringify(itensSorteados));
+
+      const animado = document.createElement('div');
+      animado.className = 'item-animado';
+      animado.textContent = item;
+      document.body.appendChild(animado);
+
+      setTimeout(() => {
+        document.body.removeChild(animado);
+        atualizarTela();
+      }, 1000);
+    }
+
+    function atualizarTela() {
+      const ultimo = itensSorteados[itensSorteados.length - 1] || "Clique no botão para começar!";
+      document.getElementById('itemSorteado').textContent = ultimo;
       document.getElementById('sorteados').textContent = "Itens sorteados: " + itensSorteados.join(", ");
+    }
+
+    function reiniciarSorteio() {
+      localStorage.removeItem('itensRestantes');
+      localStorage.removeItem('itensSorteados');
+      location.reload();
     }
   </script>
 </body>
