@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Bingo da Beleza</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #fff0f5;
+      color: #333;
+      text-align: center;
+    }
+    h1 {
+      color: #c71585;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 20px;
+      cursor: pointer;
+      background-color: #ff69b4;
+      border: none;
+      color: white;
+      border-radius: 5px;
+    }
+    .item-sorteado {
+      font-size: 24px;
+      font-weight: bold;
+      margin-top: 20px;
+      color: #800080;
+    }
+    .sorteados {
+      margin-top: 30px;
+      font-size: 14px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>✨ Bingo da Beleza ✨</h1>
+  <button onclick="sortearItem()">Sortear Item</button>
+  <div class="item-sorteado" id="itemSorteado">Clique no botão para começar!</div>
+  <div class="sorteados" id="sorteados"></div>
+
+  <script>
+    const itens = [
+      "Base líquida", "Batom em bala", "Batom líquido", "Blush", "Cola de cílios",
+      "Condicionador", "Corretivo", "Cílios postiços", "Delineador", "Esfoliante facial",
+      "Finalizador", "Fixador de maquiagem", "Gloss labial", "Hidratante corporal",
+      "Iluminador", "Lápis de boca", "Lápis de olho", "Máscara capilar", "Máscara de cílios",
+      "Máscara facial de argila", "Óleo capilar", "Óleo de rosa mosqueta", "Paleta de sombras",
+      "Pó compacto", "Primer facial", "Protetor solar facial", "Sabonete líquido",
+      "Sérum facial", "Shampoo", "Sombra unitária", "Água micelar"
+    ];
+
+    let itensRestantes = [...itens];
+    let itensSorteados = [];
+
+    function sortearItem() {
+      if (itensRestantes.length === 0) {
+        document.getElementById('itemSorteado').textContent = "Todos os itens foram sorteados!";
+        return;
+      }
+
+      const index = Math.floor(Math.random() * itensRestantes.length);
+      const item = itensRestantes.splice(index, 1)[0];
+      itensSorteados.push(item);
+
+      document.getElementById('itemSorteado').textContent = item;
+      document.getElementById('sorteados').textContent = "Itens sorteados: " + itensSorteados.join(", ");
+    }
+  </script>
+</body>
+</html>
